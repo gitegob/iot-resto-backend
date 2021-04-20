@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-// import { Order } from '../order/order.entity';
+import { Order } from '../../order/entities/order.entity';
 
 @Entity('tables')
 export class Table {
@@ -9,6 +9,6 @@ export class Table {
   @Column({ nullable: false })
   number: number;
 
-  //   @OneToMany(() => Order, (order) => order.table)
-  //   orders: Order[];
+  @OneToMany(() => Order, (order) => order.table)
+  orders: Order[];
 }

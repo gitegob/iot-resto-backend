@@ -37,6 +37,7 @@ export class TableService {
   }
 
   async remove(id: string) {
+    await this.findOne(id);
     await this.tableRepo.delete(id);
     return {};
   }

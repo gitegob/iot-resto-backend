@@ -8,9 +8,15 @@ import ormconfig from '../ormconfig';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
 import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
+import { OrderModule } from './order/order.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormconfig), ItemModule, TableModule],
+  imports: [
+    TypeOrmModule.forRoot(ormconfig),
+    ItemModule,
+    TableModule,
+    OrderModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

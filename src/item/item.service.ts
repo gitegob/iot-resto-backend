@@ -40,6 +40,7 @@ export class ItemService {
   }
 
   async remove(id: string) {
+    await this.findOne(id);
     await this.itemRepo.delete(id);
     return {};
   }
