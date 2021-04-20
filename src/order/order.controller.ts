@@ -7,28 +7,40 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
 
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  /**
+   *
+   * @param query tableId
+   * @returns Order
+   */
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Body() createOrderDto: CreateOrderDto, @Query() q: QueryParamsDto) {
+    return this.orderService.create(createOrderDto, q.tableId);
   }
 
+  /**
+   *
+   * @param query tableId
+   * @returns Order[]
+   */
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  findAll(@Query() q: QueryParamsDto) {
+    return this.orderService.findAll(q.tableId);
   }
 
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.orderService.findOne(id);
+    return this.orderService.findOne({ where: { id }, relations: ['items'] });
   }
 
   @Patch(':id')
