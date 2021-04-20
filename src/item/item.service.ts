@@ -20,7 +20,11 @@ export class ItemService {
   }
 
   async findAll() {
-    return {};
+    return {
+      data: await this.itemRepo.find({
+        where: { status: ItemStatus.AVAILABLE },
+      }),
+    };
   }
 
   async findOne(options: string | any) {
