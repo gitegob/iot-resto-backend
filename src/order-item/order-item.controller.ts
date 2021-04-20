@@ -12,26 +12,27 @@ import {
 import { OrderItemService } from './order-item.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
 
 @Controller('order-items')
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
-  @Post('')
+  @Post()
   create(
     @Body() createOrderItemDto: CreateOrderItemDto,
-    // @Param('orderId', ParseUUIDPipe) orderId: string,
-    // @Query('item', ParseUUIDPipe)
-    // itemId: string,
+    @Query() q: QueryParamsDto,
   ) {
     return this.orderItemService.create(
-      createOrderItemDto /* , orderId, itemId */,
+      createOrderItemDto,
+      q.orderId,
+      q.itemId,
     );
   }
 
   @Get()
-  findAll() {
-    return this.orderItemService.findAll();
+  findAll(@Query() q: QueryParamsDto) {
+    return this.orderItemService.findAll(q.orderId);
   }
 
   @Get(':id')

@@ -3,8 +3,7 @@ import {
   Max,
   IsString,
   MaxLength,
-  Allow,
-  IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { ItemStatus } from '../../_shared_/interfaces/enum.interface';
 
@@ -17,7 +16,6 @@ export class CreateItemDto {
   @Max(999999999999)
   price: number;
 
-  @Allow()
-  @IsEnum(ItemStatus)
+  @IsOptional()
   status: ItemStatus;
 }
