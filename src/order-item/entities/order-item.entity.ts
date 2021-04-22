@@ -8,9 +8,12 @@ export class OrderItem {
   id: string;
 
   @Column()
+  name: string;
+
+  @Column()
   quantity: number;
 
-  @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Order, (order) => order.items)
   order: Order;
 
   @ManyToOne(() => Item, (item) => item.orderedItems)

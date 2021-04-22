@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Tables')
 @Controller('tables')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
@@ -22,8 +26,8 @@ export class TableController {
   }
 
   @Get()
-  findAll() {
-    return this.tableService.findAll();
+  findAll(@Query() q: QueryParamsDto) {
+    return this.tableService.findAll(q.status);
   }
 
   @Get(':id')

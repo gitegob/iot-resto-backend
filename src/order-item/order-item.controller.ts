@@ -13,14 +13,16 @@ import { OrderItemService } from './order-item.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Order Items')
 @Controller('order-items')
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
   @Post()
   create(
-    @Body() createOrderItemDto: CreateOrderItemDto,
+    @Body() createOrderItemDto: CreateOrderItemDto[],
     @Query() q: QueryParamsDto,
   ) {
     return this.orderItemService.create(

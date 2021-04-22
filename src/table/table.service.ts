@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TableStatus } from '../_shared_/interfaces/enum.interface';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { Table } from './entities/table.entity';
@@ -18,9 +19,12 @@ export class TableService {
     return { data: newTable };
   }
 
-  async findAll() {
+  async findAll(status: TableStatus) {
     return {
-      data: await this.tableRepo.find(),
+      data: await this.tableRepo.find({
+        where: { status },
+        relations: ['orders'],
+      }),
     };
   }
 
@@ -40,5 +44,9 @@ export class TableService {
     await this.findOne(id);
     await this.tableRepo.delete(id);
     return {};
+  }
+
+  async save(tableInstance: Table): Promise<void> {
+    await this.tableRepo.save(tableInstance);
   }
 }

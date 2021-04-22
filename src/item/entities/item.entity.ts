@@ -1,7 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
 import { ItemStatus } from '../../_shared_/interfaces/enum.interface';
-
 @Entity('items')
 export class Item {
   @PrimaryGeneratedColumn('uuid')
