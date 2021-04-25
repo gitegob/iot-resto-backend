@@ -1,14 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Order } from '../order/entities/order.entity';
 import {
-  OrderStatus,
-  TableStatusQuery,
-} from '../_shared_/interfaces/enum.interface';
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
+import { Order } from '../order/entities/order.entity';
+import { TableStatusQuery } from '../_shared_/interfaces/enum.interface';
 import { sortStuffByDate } from '../_shared_/utils';
 import { CreateTableDto } from './dto/create-table.dto';
-import { UpdateTableDto } from './dto/update-table.dto';
 import { Table } from './entities/table.entity';
 
 @Injectable()
@@ -18,6 +18,10 @@ export class TableService {
   ) {}
 
   async create(createTableDto: CreateTableDto) {
+    const table = await this.tableRepo.findOne({
+      where: { number: createTableDto.number },
+    });
+    if (table) throw new ConflictException('Table already exists');
     const newTable = new Table();
     newTable.number = createTableDto.number;
     await this.tableRepo.save(newTable);
@@ -33,17 +37,15 @@ export class TableService {
       }),
     };
   }
-  async getUnpaidOrders(id: string) {
+  async getUnpaidOrders(tableId: string) {
     const { data: table } = await this.findOne({
-      where: { id },
+      where: { id: tableId },
       relations: ['orders'],
     });
     const orders = sortStuffByDate<Order>(
-      table.orders.filter(
-        (o) => o.isPaid === false && o.status === OrderStatus.SERVED,
-      ),
+      table.orders.filter((o) => o.isPaid === false),
     );
-    return { data: orders };
+    return { data: { table: table.number, unpaid: orders } };
   }
   async findTable(id: string) {
     const { data: table } = await this.findOne({
@@ -52,9 +54,9 @@ export class TableService {
     });
     return { data: table };
   }
-  async findTableOrders(id: string) {
+  async findTableOrders(tableId: string) {
     const { data: table } = await this.findOne({
-      where: { id },
+      where: { id: tableId },
       relations: ['orders'],
     });
     const orders = sortStuffByDate(table.orders);
@@ -62,22 +64,16 @@ export class TableService {
       data: { table: table.number, orders },
     };
   }
-  async findOne(options: string | any) {
+  async findOne(options: FindOneOptions<Table>) {
     const table = await this.tableRepo.findOne(options);
     if (!table) throw new NotFoundException('table not found');
     else return { data: table };
   }
 
-  async update(id: string, updateTableDto: UpdateTableDto) {
-    await this.findOne(id);
-    this.tableRepo.update({ id }, updateTableDto);
-    return {};
-  }
-
   async remove(id: string) {
-    await this.findOne(id);
+    await this.findOne({ where: { id } });
     await this.tableRepo.delete(id);
-    return {};
+    return { message: 'Table deleted' };
   }
 
   async saveTable(tableInstance: Table): Promise<void> {

@@ -14,6 +14,7 @@ export class ResponseInterceptor implements NestInterceptor {
       map((results) => {
         const res = ctx.switchToHttp().getResponse();
         return {
+          message: results?.message || 'Success',
           status: res.statusCode,
           data: results.data || null,
         };

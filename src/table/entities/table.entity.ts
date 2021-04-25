@@ -4,7 +4,7 @@ import { TableStatus } from '../../_shared_/interfaces/enum.interface';
 
 @Entity('tables')
 export class Table {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column({ nullable: false, unique: true })

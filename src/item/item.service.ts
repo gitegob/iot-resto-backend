@@ -30,6 +30,12 @@ export class ItemService {
       }),
     };
   }
+
+  async findOneItem(id: string) {
+    return {
+      data: await this.findOne({ where: { id }, relations: ['orderedItems'] }),
+    };
+  }
   async findOne(options: string | any) {
     const item = await this.itemRepo.findOne(options);
     if (!item) throw new NotFoundException('Item not found');

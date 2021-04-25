@@ -10,7 +10,7 @@ import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
 import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
 import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
-import { MessagesGateway } from './messages.gateway';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +19,7 @@ import { MessagesGateway } from './messages.gateway';
     TableModule,
     OrderModule,
     OrderItemModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -31,7 +32,6 @@ import { MessagesGateway } from './messages.gateway';
       provide: APP_FILTER,
       useClass: ExceptionsFilter,
     },
-    MessagesGateway,
   ],
 })
 export class AppModule {}
