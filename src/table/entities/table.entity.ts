@@ -7,7 +7,7 @@ export class Table {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   number: number;
 
   @Column({ enum: TableStatus, nullable: false, default: TableStatus.FREE })

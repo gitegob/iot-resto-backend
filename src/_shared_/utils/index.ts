@@ -1,4 +1,15 @@
+import { OrderItem } from '../../order-item/entities/order-item.entity';
 import { Order } from '../../order/entities/order.entity';
 
-export const orderPrice = (order: Order) =>
-  order.items.reduce((t, n) => t + n.item.price * n.quantity, 0);
+export function orderPrice(orderItems: OrderItem[]) {
+  return orderItems.reduce(
+    (total, orderItem) => total + orderItem.item.price * orderItem.quantity,
+    0,
+  );
+}
+
+export function sortStuffByDate<T extends Order>(stuff: T[]) {
+  return stuff.sort((a, b) => {
+    return b.dateCreated.getTime() - a.dateCreated.getTime();
+  });
+}

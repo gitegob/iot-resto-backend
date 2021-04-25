@@ -9,7 +9,9 @@ import {
 
 @Catch()
 export class ExceptionsFilter implements ExceptionFilter {
+  private logger: Logger = new Logger();
   catch(exception: any, host: ArgumentsHost) {
+    this.logger.error(exception.stack);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const isHttp = exception instanceof HttpException;

@@ -18,29 +18,40 @@ export class OrderItemService {
     private readonly itemService: ItemService,
   ) {}
   async create(
-    createOrderItemDtos: CreateOrderItemDto[],
+    createOrderItemDto: CreateOrderItemDto,
     orderId: any,
     itemId: any,
-  ) {
-    const { data: order } = await this.orderService.findOne({
-      where: { order: orderId, status: OrderStatus.PENDING },
+  ): Promise<{ data: OrderItem }> {
+    const order = (
+      await this.orderService.findOne({
+        where: [
+          { id: orderId, status: OrderStatus.PENDING },
+          { id: orderId, status: OrderStatus.CONFIRMED },
+        ],
+        relations: ['items'],
+      })
+    ).data;
+    const { data: item } = await this.itemService.findOne(itemId);
+    const newOrderItem = new OrderItem();
+    newOrderItem.item = item;
+    newOrderItem.order = order;
+    newOrderItem.name = item.name;
+    newOrderItem.quantity = createOrderItemDto.quantity;
+    const orderItem = await this.orderItemRepo.save(newOrderItem);
+    const orderItems = await this.orderItemRepo.find({
+      where: { order },
+      relations: ['item'],
     });
-    const orderItems = createOrderItemDtos.map(async (createOrderItemDto) => {
-      const { data: item } = await this.itemService.findOne(itemId);
-      const newOrderItem = new OrderItem();
-      newOrderItem.item = item;
-      newOrderItem.order = order;
-      newOrderItem.name = createOrderItemDto.name;
-      newOrderItem.quantity = createOrderItemDto.quantity;
-      await this.orderItemRepo.save(newOrderItem);
-      return newOrderItem;
-    });
-    order.price = orderPrice(order);
-    await this.orderService.save(order);
-    return { data: orderItems };
+    order.price = orderPrice(orderItems);
+    await this.orderService.saveOrder(order);
+    return { data: orderItem };
   }
 
-  async findAll(orderId: string | undefined) {
+  async findAll(
+    orderId: string | undefined,
+  ): Promise<{
+    data: OrderItem[];
+  }> {
     if (!orderId) return { data: await this.orderItemRepo.find() };
     return {
       data: await this.orderItemRepo.find({ where: { order: orderId } }),
@@ -65,7 +76,7 @@ export class OrderItemService {
     return {};
   }
 
-  async save(orderItemInstance: OrderItem): Promise<void> {
+  async saveOrderItem(orderItemInstance: OrderItem): Promise<void> {
     await this.orderItemRepo.save(orderItemInstance);
   }
 }

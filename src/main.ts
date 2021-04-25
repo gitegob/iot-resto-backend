@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import env from './env';
+import { global } from './_shared_/config/env.config';
 import { setupDocs } from './_shared_/config/swagger.config';
 
 async function bootstrap() {
@@ -17,8 +17,8 @@ async function bootstrap() {
   );
 
   setupDocs(app);
-  await app.listen(env.PORT || 5000, () =>
-    console.log('Server running on ' + (env.PORT || 5000)),
+  await app.listen(global.port, () =>
+    console.log('Server running on ' + global.port),
   );
 }
 bootstrap();

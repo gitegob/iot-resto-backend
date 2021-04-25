@@ -22,14 +22,11 @@ export class OrderItemController {
 
   @Post()
   create(
-    @Body() createOrderItemDto: CreateOrderItemDto[],
-    @Query() q: QueryParamsDto,
+    @Body() createOrderItemDto: CreateOrderItemDto,
+    @Query('orderId', ParseUUIDPipe) orderId: string,
+    @Query('itemId', ParseUUIDPipe) itemId: string,
   ) {
-    return this.orderItemService.create(
-      createOrderItemDto,
-      q.orderId,
-      q.itemId,
-    );
+    return this.orderItemService.create(createOrderItemDto, orderId, itemId);
   }
 
   @Get()

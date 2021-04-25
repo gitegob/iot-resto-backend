@@ -1,7 +1,8 @@
 export enum OrderStatus {
   PENDING = 'PENDING',
-  FINISHED = 'FINISHED',
-  PAID = 'PAID',
+  ACCEPTED = 'ACCEPTED',
+  CONFIRMED = 'CONFIRMED',
+  SERVED = 'SERVED',
 }
 
 export enum ItemStatus {
@@ -12,6 +13,19 @@ export enum ItemStatus {
 export enum TableStatus {
   WAITING = 'WAITING',
   SERVING = 'SERVING',
+  SERVED = 'SERVED',
   FREE = 'FREE',
-  PAID = 'PAID',
+}
+
+export enum PgErrors {
+  UNIQUE_VIOLATION = '',
+  NOT_NULL_VIOLATION = '',
+}
+
+export enum TableStatusQuery {
+  WAITING = 'WAITING',
+  SERVING = 'SERVING',
+  SERVED = 'SERVED',
+  FREE = 'FREE',
+  ALL = 'ALL',
 }

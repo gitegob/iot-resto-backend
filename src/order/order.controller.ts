@@ -10,10 +10,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Order } from './entities/order.entity';
+import { PayOrderDto } from './dto/pay-order.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -26,8 +26,9 @@ export class OrderController {
    * @returns Order
    */
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto, @Query() q: QueryParamsDto) {
-    return this.orderService.create(createOrderDto, q.tableId);
+  @ApiQuery({ name: 'tableId' })
+  create(@Query() q: QueryParamsDto) {
+    return this.orderService.create(q.tableId);
   }
 
   /**
@@ -42,15 +43,33 @@ export class OrderController {
 
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.orderService.findOne({ where: { id }, relations: ['items'] });
+    return this.orderService.findOne({
+      where: { id },
+      relations: ['items', 'table'],
+    });
   }
 
-  @Patch(':id')
-  update(
+  @Patch(':id/accept')
+  accept(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
+    return this.orderService.accept(id);
+  }
+
+  @Patch(':id/confirm')
+  confirm(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
+    return this.orderService.confirm(id);
+  }
+
+  @Patch(':id/finish')
+  finish(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
+    return this.orderService.finish(id);
+  }
+
+  @Patch(':id/pay')
+  pay(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
-  ) {
-    return this.orderService.update(id, updateOrderDto);
+    @Body() payOrderDto: PayOrderDto,
+  ): Promise<{ data: Order }> {
+    return this.orderService.pay(id, payOrderDto);
   }
 
   @Delete(':id')

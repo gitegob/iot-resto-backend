@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { ItemStatus } from '../_shared_/interfaces/enum.interface';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item } from './entities/item.entity';
@@ -49,7 +48,7 @@ export class ItemService {
     return {};
   }
 
-  async save(itemInstance: Item): Promise<void> {
+  async saveItem(itemInstance: Item): Promise<void> {
     await this.itemRepo.save(itemInstance);
   }
 }

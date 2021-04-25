@@ -22,15 +22,33 @@ export class Order {
   })
   items: OrderItem[];
 
-  @Column()
+  @Column({ default: 0 })
   price: number;
 
-  @Column()
+  @Column({ default: false })
+  isPaid: boolean;
+
+  @Column({ default: 0 })
   paidPrice: number;
 
   @Column({ enum: OrderStatus, default: OrderStatus.PENDING, nullable: false })
   status: OrderStatus;
 
+  /**
+   * time when accepted - created time
+   */
+  @Column({ nullable: true })
+  timeCreatedToAccepted: string;
+
+  @Column({ nullable: true })
+  timeConfirmed: Date;
+
+  /**
+   * time when finished - confirmed time
+   */
+  @Column({ nullable: true })
+  timeConfirmedToFinished: string;
+
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  date: Date;
+  dateCreated: Date;
 }

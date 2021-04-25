@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { TableStatus } from '../interfaces/enum.interface';
+import { TableStatusQuery } from '../interfaces/enum.interface';
 
 export class QueryParamsDto {
   @IsUUID()
@@ -19,9 +19,9 @@ export class QueryParamsDto {
   itemId: string;
 
   @IsString()
-  @IsEnum(TableStatus)
+  @IsEnum(TableStatusQuery)
   @IsOptional()
-  status: TableStatus;
+  ts: TableStatusQuery;
 
   @IsOptional()
   s: string;

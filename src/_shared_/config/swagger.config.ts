@@ -13,19 +13,19 @@ const config = new DocumentBuilder()
   .addTag('App', 'App welcome endpoint')
   // .addTag('Auth', 'Authentication Endpoints')
   .addTag('Tables', 'Table Endpoints')
-  .addTag('Items', 'Items Endpoints')
   .addTag('Orders', 'Orders Endpoints')
   .addTag('Order Items', 'Order Items Endpoints')
+  .addTag('Items', 'Items Endpoints')
   .build();
 
 const customOptions: SwaggerCustomOptions = {
   swaggerOptions: {
     persistAuthorization: true,
   },
-  customSiteTitle: 'RealtApp API',
+  customSiteTitle: 'PressMe API',
 };
 
 export function setupDocs(app: INestApplication): void {
   const document = SwaggerModule.createDocument(app, config);
-  return SwaggerModule.setup('api', app, document, customOptions);
+  return SwaggerModule.setup('api/docs', app, document, customOptions);
 }
