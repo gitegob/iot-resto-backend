@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ItemStatus } from '../_shared_/interfaces/enum.interface';
+import { ILike, Repository } from 'typeorm';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Item } from './entities/item.entity';
-
 @Injectable()
 export class ItemService {
   constructor(
@@ -21,12 +19,17 @@ export class ItemService {
 
   async findAll() {
     return {
-      data: await this.itemRepo.find({
-        where: { status: ItemStatus.AVAILABLE },
-      }),
+      data: await this.itemRepo.find(),
     };
   }
 
+  async search(s: string) {
+    return {
+      data: await this.itemRepo.find({
+        where: { name: ILike(`%${s}%`) },
+      }),
+    };
+  }
   async findOne(options: string | any) {
     const item = await this.itemRepo.findOne(options);
     if (!item) throw new NotFoundException('Item not found');
@@ -43,5 +46,9 @@ export class ItemService {
     await this.findOne(id);
     await this.itemRepo.delete(id);
     return {};
+  }
+
+  async saveItem(itemInstance: Item): Promise<void> {
+    await this.itemRepo.save(itemInstance);
   }
 }

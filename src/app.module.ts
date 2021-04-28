@@ -6,10 +6,11 @@ import { ItemModule } from './item/item.module';
 import { TableModule } from './table/table.module';
 import ormconfig from '../ormconfig';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
-import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
 import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
+import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
+import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
+import { MessagesGateway } from './messages.gateway';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { OrderItemModule } from './order-item/order-item.module';
       provide: APP_FILTER,
       useClass: ExceptionsFilter,
     },
+    MessagesGateway,
   ],
 })
 export class AppModule {}
