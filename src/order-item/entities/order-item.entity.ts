@@ -4,16 +4,19 @@ import { Order } from '../../order/entities/order.entity';
 
 @Entity('orderItems')
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: 1 })
   quantity: number;
 
-  @ManyToOne(() => Order, (order) => order.items)
+  @Column({ default: 0 })
+  price: number;
+
+  @ManyToOne(() => Order, (order) => order.orderItems)
   order: Order;
 
   @ManyToOne(() => Item, (item) => item.orderedItems)

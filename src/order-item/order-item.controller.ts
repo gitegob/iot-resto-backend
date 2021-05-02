@@ -3,52 +3,55 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
-  ParseUUIDPipe,
+  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderItemService } from './order-item.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
-import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from '../_shared_/guards/jwt.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../_shared_/interfaces/enum.interface';
+import { RolesGuard } from '../_shared_/guards/roles.guard';
 
 @ApiTags('Order Items')
+@ApiBearerAuth()
+@UseGuards(JwtGuard)
 @Controller('order-items')
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
-  @Post()
+  @Post('order/:orderId')
+  @Roles(Role.WAITER)
+  @UseGuards(RolesGuard)
   create(
     @Body() createOrderItemDto: CreateOrderItemDto,
-    @Query('orderId', ParseUUIDPipe) orderId: string,
-    @Query('itemId', ParseUUIDPipe) itemId: string,
+    @Param('orderId', ParseIntPipe) orderId: string,
+    @Query('itemId', ParseIntPipe) itemId: string,
   ) {
     return this.orderItemService.create(createOrderItemDto, orderId, itemId);
   }
 
-  @Get()
-  findAll(@Query() q: QueryParamsDto) {
-    return this.orderItemService.findAll(q.orderId);
+  @Get('order/:orderId')
+  findAll(@Param('orderId', ParseIntPipe) orderId: string) {
+    return this.orderItemService.findByOrder(orderId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.orderItemService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateOrderItemDto: UpdateOrderItemDto,
-  ) {
-    return this.orderItemService.update(id, updateOrderItemDto);
+  findOne(@Param('id', ParseIntPipe) id: string) {
+    return this.orderItemService.findOne({
+      where: { id },
+      relations: ['order'],
+    });
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  @Roles(Role.WAITER)
+  @UseGuards(RolesGuard)
+  remove(@Param('id', ParseIntPipe) id: string) {
     return this.orderItemService.remove(id);
   }
 }

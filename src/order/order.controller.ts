@@ -6,17 +6,24 @@ import {
   Patch,
   Param,
   Delete,
-  ParseUUIDPipe,
-  Query,
+  UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { QueryParamsDto } from '../_shared_/dto/query-params.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Order } from './entities/order.entity';
 import { PayOrderDto } from './dto/pay-order.dto';
+import { JwtGuard } from '../_shared_/guards/jwt.guard';
+import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../_shared_/interfaces/enum.interface';
+import { UserData } from '../_shared_/decorators/user.decorator';
+import { JwtPayload } from '../_shared_/interfaces';
 
-@ApiTags('Orders')
 @Controller('orders')
+@ApiTags('Orders')
+@ApiBearerAuth()
+@UseGuards(JwtGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -25,10 +32,14 @@ export class OrderController {
    * @param query tableId
    * @returns Order
    */
-  @Post()
-  @ApiQuery({ name: 'tableId' })
-  create(@Query() q: QueryParamsDto) {
-    return this.orderService.create(q.tableId);
+  @Post('table/:tableId')
+  @UseGuards(RolesGuard)
+  @Roles(Role.WAITER)
+  create(
+    @Param('tableId', ParseIntPipe) tableId: string,
+    @UserData() user: JwtPayload,
+  ) {
+    return this.orderService.create(tableId, user);
   }
 
   /**
@@ -36,44 +47,54 @@ export class OrderController {
    * @param query tableId
    * @returns Order[]
    */
-  @Get()
-  findAll(@Query() q: QueryParamsDto) {
-    return this.orderService.findAll(q.tableId);
+  @Get('table/:tableId')
+  findAll(@Param('tableId', ParseIntPipe) tableId: string) {
+    return this.orderService.findAll(tableId);
+  }
+
+  /**
+   *
+   * @returns Order[]
+   */
+  @Get('paid-confirmed')
+  findPaidConfirmed() {
+    return this.orderService.findPaidConfirmed();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: string) {
     return this.orderService.findOne({
       where: { id },
-      relations: ['items', 'table'],
+      relations: ['orderItems', 'table'],
     });
   }
 
-  @Patch(':id/accept')
-  accept(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
-    return this.orderService.accept(id);
-  }
-
   @Patch(':id/confirm')
-  confirm(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
+  @UseGuards(RolesGuard)
+  @Roles(Role.WAITER)
+  confirm(@Param('id', ParseIntPipe) id: string): Promise<{ data: Order }> {
     return this.orderService.confirm(id);
   }
 
   @Patch(':id/finish')
-  finish(@Param('id', ParseUUIDPipe) id: string): Promise<{ data: Order }> {
+  @UseGuards(RolesGuard)
+  @Roles(Role.KITCHEN)
+  finish(@Param('id', ParseIntPipe) id: string): Promise<{ data: Order }> {
     return this.orderService.finish(id);
   }
 
   @Patch(':id/pay')
   pay(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: string,
     @Body() payOrderDto: PayOrderDto,
   ): Promise<{ data: Order }> {
     return this.orderService.pay(id, payOrderDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.orderService.remove(id);
+  @UseGuards(RolesGuard)
+  @Roles(Role.WAITER)
+  remove(@Param('id', ParseIntPipe) id: string) {
+    return this.orderService.cancel(id);
   }
 }

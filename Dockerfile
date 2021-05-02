@@ -2,14 +2,16 @@ FROM node:14.16.0-alpine3.10
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json yarn.lock ./
 
-COPY yarn.lock ./
+RUN yarn global add @nestjs/cli@7.6.0
 
 RUN yarn install
 
 COPY . .
 
-EXPOSE 5000
+ENV NODE_ENV=production
 
-CMD yarn run start:dev
+EXPOSE $PORT
+
+CMD yarn start

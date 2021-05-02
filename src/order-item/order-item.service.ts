@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { ItemService } from '../item/item.service';
 import { OrderService } from '../order/order.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderStatus } from '../_shared_/interfaces/enum.interface';
 
@@ -19,40 +18,42 @@ export class OrderItemService {
   ) {}
   async create(
     createOrderItemDto: CreateOrderItemDto,
-    orderId: any,
-    itemId: any,
-  ): Promise<{ data: OrderItem }> {
-    const order = (
-      await this.orderService.findOne({
-        where: [
-          { id: orderId, status: OrderStatus.PENDING },
-          { id: orderId, status: OrderStatus.CONFIRMED },
-        ],
-        relations: ['items'],
-      })
-    ).data;
+    orderId: string,
+    itemId: string,
+  ): Promise<any> {
+    const { data: order } = await this.orderService.findOne({
+      where: { id: orderId, status: OrderStatus.PENDING },
+    });
     const { data: item } = await this.itemService.findOne(itemId);
     const newOrderItem = new OrderItem();
-    newOrderItem.item = item;
     newOrderItem.order = order;
+    newOrderItem.item = item;
     newOrderItem.name = item.name;
     newOrderItem.quantity = createOrderItemDto.quantity;
-    const orderItem = await this.orderItemRepo.save(newOrderItem);
+    newOrderItem.price = item.price * newOrderItem.quantity;
+    await this.orderItemRepo.save(newOrderItem);
     const orderItems = await this.orderItemRepo.find({
       where: { order },
-      relations: ['item'],
     });
     order.price = orderPrice(orderItems);
     await this.orderService.saveOrder(order);
-    return { data: orderItem };
+    return {
+      data: {
+        order: (
+          await this.orderService.findOne({
+            where: { id: orderId },
+            relations: ['orderItems'],
+          })
+        ).data,
+      },
+    };
   }
 
-  async findAll(
-    orderId: string | undefined,
+  async findByOrder(
+    orderId: string,
   ): Promise<{
     data: OrderItem[];
   }> {
-    if (!orderId) return { data: await this.orderItemRepo.find() };
     return {
       data: await this.orderItemRepo.find({ where: { order: orderId } }),
     };
@@ -62,12 +63,6 @@ export class OrderItemService {
     const orderItem = await this.orderItemRepo.findOne(options);
     if (!orderItem) throw new NotFoundException('order item not found');
     else return { data: orderItem };
-  }
-
-  async update(id: string, updateOrderItemDto: UpdateOrderItemDto) {
-    await this.findOne(id);
-    this.orderItemRepo.update({ id }, updateOrderItemDto);
-    return {};
   }
 
   async remove(id: string) {

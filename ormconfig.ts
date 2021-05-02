@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { User } from './src/auth/entities/auth.entity';
 import { Item } from './src/item/entities/item.entity';
 import { OrderItem } from './src/order-item/entities/order-item.entity';
 import { Order } from './src/order/entities/order.entity';
@@ -9,8 +10,8 @@ const ormconfig: TypeOrmModuleOptions = {
   ...db,
   type: 'postgres',
   port: 5432,
-  entities: [Item, Table, Order, OrderItem],
-  synchronize: global.nodeEnv !== 'production',
+  entities: [User, Item, Table, Order, OrderItem],
+  synchronize: db.noSync ? false : true,
   migrations: ['dist/src/db/migrations/*.js'],
   cli: {
     migrationsDir: 'src/db/migrations',

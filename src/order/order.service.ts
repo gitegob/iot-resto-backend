@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as prettyMilliseconds from 'pretty-ms';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { TableService } from '../table/table.service';
 import {
   OrderStatus,
@@ -16,41 +16,22 @@ export class OrderService {
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
     private readonly tableService: TableService,
   ) {}
-  async create(tableId: string) {
+  async create(tableId: string, user: any) {
     const { data: table } = await this.tableService.findOne({
-      where: [
-        { id: tableId, status: TableStatus.FREE },
-        { id: tableId, status: TableStatus.SERVED },
-      ],
+      where: { id: tableId, status: TableStatus.FREE },
     });
-    table.status = TableStatus.WAITING;
-    const newOrder = new Order();
+    let newOrder = new Order();
     newOrder.table = table;
     newOrder.status = OrderStatus.PENDING;
-    await this.orderRepo.save(newOrder);
+    newOrder.waiter = user;
     await this.tableService.saveTable(table);
+    newOrder = await this.orderRepo.save(newOrder);
     return { data: newOrder };
-  }
-
-  async accept(orderId: string) {
-    const { data: order } = await this.findOne({
-      where: { id: orderId, status: OrderStatus.PENDING },
-      relations: ['table'],
-    });
-    const { data: table } = await this.tableService.findOne(order.table.id);
-    order.status = OrderStatus.ACCEPTED;
-    order.timeCreatedToAccepted = prettyMilliseconds(
-      new Date().getTime() - order.dateCreated.getTime(),
-    );
-    table.status = TableStatus.SERVING;
-    await this.orderRepo.save(order);
-    await this.tableService.saveTable(table);
-    return { data: order };
   }
 
   async confirm(orderId: string) {
     const { data: order } = await this.findOne({
-      where: { id: orderId, status: OrderStatus.ACCEPTED },
+      where: { id: orderId, status: OrderStatus.PENDING },
     });
     order.status = OrderStatus.CONFIRMED;
     order.timeConfirmed = new Date();
@@ -60,50 +41,70 @@ export class OrderService {
 
   async finish(orderId: string) {
     let { data: order } = await this.findOne({
-      where: { id: orderId, status: OrderStatus.CONFIRMED },
+      where: { id: orderId, isPaid: true, status: OrderStatus.CONFIRMED },
       relations: ['table'],
     });
-    const { data: table } = await this.tableService.findOne(order.table.id);
+    const { data: table } = await this.tableService.findOne({
+      where: { id: order.table.id },
+    });
     order.status = OrderStatus.SERVED;
-    order.timeConfirmedToFinished = prettyMilliseconds(
+    order.timeConfirmedToServed = prettyMilliseconds(
       new Date().getTime() - order.timeConfirmed.getTime(),
     );
-    table.status = TableStatus.SERVED;
+    table.status = TableStatus.FREE;
     await this.tableService.saveTable(table);
     order = await this.orderRepo.save(order);
+    delete order.table;
     return { data: order };
   }
 
   async pay(orderId: string, payOrderDto: PayOrderDto) {
-    let { data: order } = await this.findOne({
-      where: { id: orderId, status: OrderStatus.SERVED },
+    const { data: order } = await this.findOne({
+      where: { id: orderId, isPaid: false, status: OrderStatus.CONFIRMED },
       relations: ['table'],
     });
-    const { data: table } = await this.tableService.findOne(order.table.id);
+    const { data: table } = await this.tableService.findOne({
+      where: { id: order.table.id },
+    });
     order.paidPrice = payOrderDto.price;
     order.isPaid = true;
-    table.status = TableStatus.FREE;
+    table.status = TableStatus.WAITING;
     await this.tableService.saveTable(table);
-    order = await this.orderRepo.save(order);
+    await this.orderRepo.save(order);
+    delete order.table;
     return { data: order };
   }
 
   async findAll(tableId: string | undefined) {
     if (!tableId)
       return { data: await this.orderRepo.find({ relations: ['table'] }) };
-    return { data: await this.orderRepo.find({ where: { table: tableId } }) };
+    return {
+      data: await this.orderRepo.find({ where: { table: tableId } }),
+    };
   }
 
-  async findOne(options: string | any) {
+  async findPaidConfirmed() {
+    return {
+      data: await this.orderRepo.find({
+        where: { isPaid: true, status: OrderStatus.CONFIRMED },
+        relations: ['table', 'waiter'],
+        order: { dateCreated: 'DESC' },
+      }),
+    };
+  }
+
+  async findOne(options?: FindOneOptions<Order>) {
     const order = await this.orderRepo.findOne(options);
     if (!order) throw new NotFoundException('order not found');
     else return { data: order };
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async cancel(id: string) {
+    await this.findOne({
+      where: { id, status: OrderStatus.PENDING },
+    });
     await this.orderRepo.delete(id);
-    return {};
+    return { message: 'Order cancelled' };
   }
 
   async saveOrder(orderInstance: Order): Promise<void> {

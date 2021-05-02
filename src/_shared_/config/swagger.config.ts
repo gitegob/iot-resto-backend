@@ -6,12 +6,12 @@ import {
 } from '@nestjs/swagger';
 
 const config = new DocumentBuilder()
-  //   .addBearerAuth({ type: 'http', scheme: 'bearer' })
+  .addBearerAuth({ type: 'http', scheme: 'bearer' })
   .setTitle('PressMe')
   .setDescription('The PressMe documentation')
   .setVersion('1.0.0')
   .addTag('App', 'App welcome endpoint')
-  // .addTag('Auth', 'Authentication Endpoints')
+  .addTag('Auth', 'Authentication Endpoints')
   .addTag('Tables', 'Table Endpoints')
   .addTag('Orders', 'Orders Endpoints')
   .addTag('Order Items', 'Order Items Endpoints')
