@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { LoginDto } from './dto/login-dto';
 import { SignupDto } from './dto/signup-dto';
 import { JwtGuard } from '../_shared_/guards/jwt.guard';
 import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { DeactivateUserDto } from './dto/deactivate-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -31,11 +33,19 @@ export class AuthController {
     return this.authService.logIn(loginDto);
   }
 
-  @Post('signup')
+  @Post('register')
   @ApiBearerAuth()
-  @Roles(Role.ADMIN)
+  @Roles(Role.SITE_ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   signUp(@Body() signupDto: SignupDto) {
     return this.authService.signUp(signupDto);
+  }
+
+  @Put('admin/deactivate')
+  @ApiBearerAuth()
+  @Roles(Role.SITE_ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
+  deactivate(@Body() deactivateDto: DeactivateUserDto) {
+    return this.authService.deactivate(deactivateDto);
   }
 }

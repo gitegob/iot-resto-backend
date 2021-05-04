@@ -19,6 +19,7 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../_shared_/interfaces/enum.interface';
 import { UserData } from '../_shared_/decorators/user.decorator';
 import { JwtPayload } from '../_shared_/interfaces';
+import { CreateOrderDto } from './dto/create-order.dto';
 
 @Controller('orders')
 @ApiTags('Orders')
@@ -27,6 +28,10 @@ import { JwtPayload } from '../_shared_/interfaces';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Get()
+  getAll() {
+    return this.orderService.findAllOrders();
+  }
   /**
    *
    * @param query tableId
@@ -37,9 +42,10 @@ export class OrderController {
   @Roles(Role.WAITER)
   create(
     @Param('tableId', ParseIntPipe) tableId: string,
+    @Body() createOrderDto: CreateOrderDto,
     @UserData() user: JwtPayload,
   ) {
-    return this.orderService.create(tableId, user);
+    return this.orderService.create(tableId, user, createOrderDto);
   }
 
   /**

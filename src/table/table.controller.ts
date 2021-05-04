@@ -26,7 +26,7 @@ export class TableController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.SITE_ADMIN, Role.MANAGER)
   create(@Body() createTableDto: CreateTableDto) {
     return this.tableService.create(createTableDto);
   }
@@ -53,7 +53,7 @@ export class TableController {
 
   @Delete(':id')
   @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @Roles(Role.SITE_ADMIN, Role.MANAGER)
   remove(@Param('id', ParseIntPipe) id: string) {
     return this.tableService.remove(id);
   }

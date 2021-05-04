@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -14,6 +15,7 @@ import { User } from './entities/auth.entity';
 import { Role } from '../_shared_/interfaces/enum.interface';
 import { JwtPayload } from '../_shared_/interfaces';
 import { SignupDto } from './dto/signup-dto';
+import { DeactivateUserDto } from './dto/deactivate-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,18 +40,18 @@ export class AuthService {
         delete admin.password;
         return { data: { access_token: this.jwtService.sign({ ...admin }) } };
       }
-      const newAdmin = new User();
-      newAdmin.username = loginDto.username;
+      const newSiteAdmin = new User();
+      newSiteAdmin.username = loginDto.username;
       const hash = await bcrypt.hash(loginDto.password, 10);
-      newAdmin.password = hash;
-      newAdmin.firstName = 'Pressme';
-      newAdmin.lastName = 'Admin';
-      newAdmin.role = Role.ADMIN;
-      await this.userRepo.save(newAdmin);
-      delete newAdmin.password;
+      newSiteAdmin.password = hash;
+      newSiteAdmin.firstName = 'Pressme';
+      newSiteAdmin.lastName = 'Admin';
+      newSiteAdmin.role = Role.SITE_ADMIN;
+      await this.userRepo.save(newSiteAdmin);
+      delete newSiteAdmin.password;
       return {
         data: {
-          access_token: this.jwtService.sign({ ...newAdmin }),
+          access_token: this.jwtService.sign({ ...newSiteAdmin }),
         },
       };
     }
@@ -60,7 +62,7 @@ export class AuthService {
 
   async logIn(loginDto: LoginDto) {
     const user = await this.userRepo.findOne({
-      where: { username: loginDto.username },
+      where: { username: loginDto.username, active: true },
     });
     if (!user) throw new UnauthorizedException('This account does not exist');
     const isMatch = await bcrypt.compare(loginDto.password, user.password);
@@ -105,5 +107,15 @@ export class AuthService {
         userData: newUser,
       },
     };
+  }
+
+  async deactivate(deactivateDto: DeactivateUserDto) {
+    const user = await this.userRepo.findOne({
+      where: { username: deactivateDto.username, active: true },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    user.active = false;
+    await this.userRepo.save(user);
+    return { message: 'User deactivated' };
   }
 }

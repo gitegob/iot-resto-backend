@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,6 +11,8 @@ import { OrderItemModule } from './order-item/order-item.module';
 import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
 import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
 import { AuthModule } from './auth/auth.module';
+import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
+import { RestoModule } from './resto/resto.module';
 
 @Module({
   imports: [
@@ -20,13 +22,19 @@ import { AuthModule } from './auth/auth.module';
     OrderModule,
     OrderItemModule,
     AuthModule,
+    RestoModule,
   ],
   controllers: [AppController],
   providers: [
+    Logger,
     AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggerInterceptor,
     },
     {
       provide: APP_FILTER,

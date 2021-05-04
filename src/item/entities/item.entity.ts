@@ -9,11 +9,17 @@ export class Item {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ default: 'None' })
+  description: string;
+
   @Column({ enum: ItemStatus, nullable: false, default: ItemStatus.AVAILABLE })
   status: ItemStatus;
 
   @Column({ nullable: false })
   price: number;
+
+  @Column({ nullable: true })
+  picture: string;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
   orderedItems: OrderItem[];
