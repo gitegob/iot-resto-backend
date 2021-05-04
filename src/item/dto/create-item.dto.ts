@@ -16,6 +16,12 @@ export class CreateItemDto {
   })
   name: string;
 
+  @IsString()
+  @ApiProperty({
+    default: 'A very tasty burger with double the price',
+  })
+  description: string;
+
   @IsNumber({}, { message: 'Price must be a number' })
   @Max(999999999999)
   @ApiProperty({

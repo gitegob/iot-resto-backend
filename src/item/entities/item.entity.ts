@@ -9,6 +9,9 @@ export class Item {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ default: 'None' })
+  description: string;
+
   @Column({ enum: ItemStatus, nullable: false, default: ItemStatus.AVAILABLE })
   status: ItemStatus;
 
