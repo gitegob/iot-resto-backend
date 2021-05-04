@@ -16,6 +16,8 @@ export class User {
   password: string;
   @Column()
   role: Role;
+  @Column({ default: true })
+  active: boolean;
   @OneToMany(() => Order, (order) => order.waiter)
   ordersServed: Order[];
 }
