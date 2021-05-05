@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(loggerConfig),
   });
-
+  
   const logger = new Logger('STARTUP');
   process.on('unhandledRejection', (e) => {
     logger.error(e);

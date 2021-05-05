@@ -28,7 +28,6 @@ export class CreateItemDto {
       'https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/216054.jpg',
   })
   picture: string;
-
   @IsNumber({}, { message: 'Price must be a number' })
   @Max(999999999999)
   @ApiProperty({
