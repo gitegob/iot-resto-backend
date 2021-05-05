@@ -12,6 +12,7 @@ import { ExceptionsFilter } from './_shared_/filters/exceptions.filter';
 import { ResponseInterceptor } from './_shared_/interceptors/response.interceptor';
 import { AuthModule } from './auth/auth.module';
 import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
+import { RestoModule } from './resto/resto.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
     OrderModule,
     OrderItemModule,
     AuthModule,
+    RestoModule,
   ],
   controllers: [AppController],
   providers: [

@@ -35,7 +35,7 @@ export class AuthController {
 
   @Post('register')
   @ApiBearerAuth()
-  @Roles(Role.ADMIN)
+  @Roles(Role.SITE_ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   signUp(@Body() signupDto: SignupDto) {
     return this.authService.signUp(signupDto);
@@ -43,7 +43,7 @@ export class AuthController {
 
   @Put('admin/deactivate')
   @ApiBearerAuth()
-  @Roles(Role.ADMIN)
+  @Roles(Role.SITE_ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   deactivate(@Body() deactivateDto: DeactivateUserDto) {
     return this.authService.deactivate(deactivateDto);

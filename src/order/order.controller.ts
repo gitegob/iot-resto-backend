@@ -28,6 +28,10 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Get()
+  getAll() {
+    return this.orderService.findAllOrders();
+  }
   /**
    *
    * @param query tableId

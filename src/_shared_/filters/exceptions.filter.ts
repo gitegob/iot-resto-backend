@@ -9,7 +9,7 @@ import {
 
 @Catch()
 export class ExceptionsFilter implements ExceptionFilter {
-  private logger: Logger = new Logger();
+  private logger: Logger = new Logger('EXCEPTION');
   catch(exception: any, host: ArgumentsHost) {
     this.logger.error(exception.stack);
     const ctx = host.switchToHttp();

@@ -11,8 +11,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(loggerConfig),
   });
-
-  const logger = app.get(Logger);
+  
+  const logger = new Logger('STARTUP');
   process.on('unhandledRejection', (e) => {
     logger.error(e);
     process.exit(1);
@@ -30,7 +30,7 @@ async function bootstrap() {
   setupDocs(app);
 
   await app.listen(global.port, () =>
-    new Logger('APP').verbose('Server running on port ' + global.port + '...'),
+    logger.log('Server running on port ' + global.port + '...'),
   );
 }
 bootstrap();

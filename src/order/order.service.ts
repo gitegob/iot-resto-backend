@@ -52,6 +52,13 @@ export class OrderService {
     return { data: newOrder };
   }
 
+  async findAllOrders() {
+    return {
+      message: 'Success',
+      data: await this.orderRepo.find(),
+    };
+  }
+
   async confirm(orderId: string) {
     const { data: order } = await this.findOne({
       where: { id: orderId, status: OrderStatus.PENDING },
@@ -110,7 +117,7 @@ export class OrderService {
     return {
       data: await this.orderRepo.find({
         where: { isPaid: true, status: OrderStatus.CONFIRMED },
-        relations: ['table', 'waiter'],
+        relations: ['table', 'waiter', 'orderItems'],
         order: { dateCreated: 'DESC' },
       }),
     };

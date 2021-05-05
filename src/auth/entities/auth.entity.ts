@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { Role } from '../../_shared_/interfaces/enum.interface';
@@ -13,6 +14,7 @@ export class User {
   @Column({ unique: true })
   username: string;
   @Column()
+  @Exclude()
   password: string;
   @Column()
   role: Role;

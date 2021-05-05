@@ -12,16 +12,22 @@ export class CreateItemDto {
   @IsString()
   @MaxLength(200)
   @ApiProperty({
-    default: 'King Burger',
+    default: 'Pizza',
   })
   name: string;
 
   @IsString()
   @ApiProperty({
-    default: 'A very tasty burger with double the price',
+    default: "Luigi's extra tasty pizza",
   })
   description: string;
 
+  @IsString()
+  @ApiProperty({
+    default:
+      'https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/216054.jpg',
+  })
+  picture: string;
   @IsNumber({}, { message: 'Price must be a number' })
   @Max(999999999999)
   @ApiProperty({

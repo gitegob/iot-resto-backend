@@ -14,6 +14,7 @@ export class ItemService {
     newItem.name = createItemDto.name;
     newItem.description = createItemDto.description;
     newItem.price = createItemDto.price;
+    newItem.picture = createItemDto.picture;
     await this.itemRepo.save(newItem);
     return { data: newItem };
   }

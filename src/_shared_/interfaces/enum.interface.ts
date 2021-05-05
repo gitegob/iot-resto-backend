@@ -27,7 +27,8 @@ export enum TableStatusQuery {
 }
 
 export enum Role {
-  ADMIN = 'ADMIN',
+  SITE_ADMIN = 'SITE_ADMIN',
+  RESTO_ADMIN = 'RESTO_ADMIN',
   MANAGER = 'MANAGER',
   WAITER = 'WAITER',
   KITCHEN = 'KITCHEN',

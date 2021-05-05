@@ -11,11 +11,8 @@ export default {
     silly: 6,
   },
   format: format.combine(
-    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    format.printf(
-      (entry) => `${entry.timestamp} ${entry.level}: ${entry.message}`,
-    ),
-    format.colorize({ all: true }),
+    format.timestamp({ format: 'HH:mm:ss YYYY-MM-DD' }),
+    format.simple(),
   ),
   transports: [
     new transports.File({

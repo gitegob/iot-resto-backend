@@ -18,6 +18,9 @@ export class Item {
   @Column({ nullable: false })
   price: number;
 
+  @Column({ nullable: true })
+  picture: string;
+
   @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
   orderedItems: OrderItem[];
 }
