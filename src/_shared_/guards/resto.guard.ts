@@ -15,6 +15,7 @@ export class RestoGuard implements CanActivate {
     if (!resto_token)
       throw new ForbiddenException('Forbidden, Restaurant unknown');
     const resto = this.jwtService.verify(resto_token);
+    console.log(resto);
     if (!resto) throw new ForbiddenException('Forbidden, Restaurant unknown');
     request.resto = resto;
     return true;

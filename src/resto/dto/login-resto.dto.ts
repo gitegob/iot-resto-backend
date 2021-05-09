@@ -1,14 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Allow, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
-export class CreateRestoDto {
+export class LoginRestoDto {
   @IsString()
   @ApiProperty({ default: 'resto1' })
   name: string;
   @IsString()
   @ApiProperty({ default: 'Password' })
   password: string;
-  @Allow()
-  @ApiProperty({ default: true })
-  active: boolean;
 }

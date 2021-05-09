@@ -9,10 +9,10 @@ import {
 export class Resto {
   @PrimaryGeneratedColumn()
   id: string;
+  @Column({ unique: true })
+  name: string;
   @Column()
-  restoname: string;
-  @Column()
-  restopassword: string;
+  password: string;
   @Column({ default: true })
   active: boolean;
   @CreateDateColumn()

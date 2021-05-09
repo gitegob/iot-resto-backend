@@ -8,32 +8,35 @@ import {
   UseGuards,
   ParseIntPipe,
   Query,
+  Req,
 } from '@nestjs/common';
 import { TableService } from './table.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Role, TableStatusQuery } from '../_shared_/interfaces/enum.interface';
 import { JwtGuard } from '../_shared_/guards/jwt.guard';
-import { Roles } from '../auth/decorators/role.decorator';
 import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { RestoGuard } from '../_shared_/guards/resto.guard';
+import { Roles } from '../_shared_/decorators/role.decorator';
 
 @Controller('tables')
 @ApiBearerAuth()
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RestoGuard)
 @ApiTags('Tables')
 export class TableController {
   constructor(private readonly tableService: TableService) {}
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(Role.SITE_ADMIN, Role.MANAGER)
+  @Roles(Role.MANAGER)
   create(@Body() createTableDto: CreateTableDto) {
     return this.tableService.create(createTableDto);
   }
 
   @Get()
   @ApiQuery({ name: 'status', enum: TableStatusQuery })
-  findAll(@Query('status') status: TableStatusQuery) {
+  findAll(@Query('status') status: TableStatusQuery, @Req() req) {
+    console.log(req.resto);
     return this.tableService.findAll(status);
   }
 

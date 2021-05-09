@@ -7,6 +7,7 @@ import { jwt } from '../_shared_/config/env.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/auth.entity';
 import { JwtStrategy } from './jwt.strategy';
+import { RestoModule } from '../resto/resto.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtStrategy } from './jwt.strategy';
         expiresIn: jwt.expiresIn,
       },
     }),
+    RestoModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
