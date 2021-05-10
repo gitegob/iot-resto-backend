@@ -15,11 +15,11 @@ import { Order } from './entities/order.entity';
 import { PayOrderDto } from './dto/pay-order.dto';
 import { JwtGuard } from '../_shared_/guards/jwt.guard';
 import { RolesGuard } from '../_shared_/guards/roles.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../_shared_/interfaces/enum.interface';
 import { UserData } from '../_shared_/decorators/user.decorator';
 import { JwtPayload } from '../_shared_/interfaces';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Roles } from '../_shared_/decorators/role.decorator';
+import { Role } from '../_shared_/interfaces/enum.interface';
 
 @Controller('orders')
 @ApiTags('Orders')

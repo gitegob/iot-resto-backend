@@ -13,9 +13,9 @@ import { OrderItemService } from './order-item.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../_shared_/guards/jwt.guard';
-import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../_shared_/interfaces/enum.interface';
 import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { Roles } from '../_shared_/decorators/role.decorator';
 
 @ApiTags('Order Items')
 @ApiBearerAuth()
