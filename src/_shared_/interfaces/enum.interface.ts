@@ -33,3 +33,8 @@ export enum Role {
   WAITER = 'WAITER',
   KITCHEN = 'KITCHEN',
 }
+
+export enum TransactionType {
+  RECHARGE = 'RECHARGE',
+  DEDUCT = 'DEDUCT',
+}

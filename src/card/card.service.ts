@@ -1,24 +1,35 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/order/entities/order.entity';
-import { OrderStatus } from 'src/_shared_/interfaces/enum.interface';
+import {
+  OrderStatus,
+  TransactionType,
+} from 'src/_shared_/interfaces/enum.interface';
 import { Repository } from 'typeorm';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from './entities/card.entity';
+import { Transaction } from './entities/transaction.entity';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectRepository(Card) private readonly cardRepo: Repository<Card>,
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepo: Repository<Transaction>,
   ) {}
 
   async create(createCardDto: CreateCardDto) {
+    const card = await this.cardRepo.findOne({
+      where: { uid: createCardDto.uid },
+    });
+    if (card) throw new ConflictException('This card is already registered');
     const newCard = new Card();
     newCard.owner = createCardDto.owner;
     newCard.uid = createCardDto.uid;
@@ -27,7 +38,21 @@ export class CardService {
   }
 
   async findAll() {
-    return { message: 'Cards retrieved', data: await this.cardRepo.find() };
+    return { message: 'All cards retrieved', data: await this.cardRepo.find() };
+  }
+
+  async findAllTransactions() {
+    return {
+      message: 'All transactions retrieved',
+      data: await this.transactionRepo.find(),
+    };
+  }
+
+  async findSingleCardTransactions(cardUid: string) {
+    return {
+      message: 'All transactions retrieved',
+      data: await this.transactionRepo.find({ where: { cardUid } }),
+    };
   }
 
   async findOneCard(uid: string) {
@@ -49,11 +74,20 @@ export class CardService {
       throw new BadRequestException(
         `Your card balance is not enough. Balance is: ${card.balance}`,
       );
+
     card.balance = card.balance - order.price;
     await this.cardRepo.save(card);
+
     order.isPaid = true;
     order.paidPrice = order.price;
     await this.orderRepo.save(order);
+
+    const newTransaction: any = new Transaction();
+    newTransaction.card = card.id;
+    newTransaction.cardUid = card.uid;
+    newTransaction.type = TransactionType.DEDUCT;
+    newTransaction.amount = order.price;
+    await this.transactionRepo.save(newTransaction);
 
     return {
       message: 'Success',
@@ -69,6 +103,14 @@ export class CardService {
     if (!card) throw new NotFoundException('This card does not exist');
     card.balance = card.balance - amount;
     await this.cardRepo.save(card);
+
+    const newTransaction: any = new Transaction();
+    newTransaction.card = card.id;
+    newTransaction.cardUid = card.uid;
+    newTransaction.type = TransactionType.RECHARGE;
+    newTransaction.amount = amount;
+    await this.transactionRepo.save(newTransaction);
+
     return {
       message: 'Card recharged',
       data: {
