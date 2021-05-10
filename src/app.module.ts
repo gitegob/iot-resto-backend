@@ -14,7 +14,6 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
 import { RestoModule } from './resto/resto.module';
 import { CardModule } from './card/card.module';
-import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -26,7 +25,6 @@ import { TransactionModule } from './transaction/transaction.module';
     AuthModule,
     RestoModule,
     CardModule,
-    TransactionModule,
   ],
   controllers: [AppController],
   providers: [

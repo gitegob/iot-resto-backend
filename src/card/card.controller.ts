@@ -35,13 +35,22 @@ export class CardController {
   findAll() {
     return this.cardService.findAll();
   }
-
+  @Get('transactions')
+  findAllTransactions() {
+    return this.cardService.findAllTransactions();
+  }
   @Get(':uid')
   findOne(@Param('uid') uid: string) {
     return this.cardService.findOneCard(uid);
   }
 
+  @Get(':uid/transactions')
+  findSingleCardTransactions(@Param('uid') uid: string) {
+    return this.cardService.findSingleCardTransactions(uid);
+  }
+
   @Get(':uid/deduct')
+  @Roles(Role.WAITER)
   deductBalance(
     @Param('uid') uid: string,
     @Query('orderId', ParseIntPipe) orderId: string,
@@ -51,6 +60,7 @@ export class CardController {
   }
 
   @Patch(':uid/recharge')
+  @Roles(Role.MANAGER, Role.WAITER)
   rechargeBalance(
     @Param('uid') uid: string,
     @Query('amount', ParseIntPipe) amount: string,

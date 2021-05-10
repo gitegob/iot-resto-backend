@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Card } from 'src/card/entities/card.entity';
-import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { Transaction } from 'src/card/entities/transaction.entity';
 import { User } from './src/auth/entities/auth.entity';
 import { Item } from './src/item/entities/item.entity';
 import { OrderItem } from './src/order-item/entities/order-item.entity';
