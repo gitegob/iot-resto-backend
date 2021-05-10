@@ -5,7 +5,7 @@ export class AppService {
   getHello() {
     return { message: 'Hello World!' };
   }
-  sendCardId(card: CardDto) {
-    return { message: 'Hello bruh, this below is your card id', data: card.id };
+  sendCardId(uid: string) {
+    return { message: 'Hello bruh, this below is your card id', data: uid };
   }
 }

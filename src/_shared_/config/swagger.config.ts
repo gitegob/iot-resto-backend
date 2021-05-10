@@ -17,6 +17,7 @@ const config = new DocumentBuilder()
   .addTag('Orders', 'Orders Endpoints')
   .addTag('Order Items', 'Order Items Endpoints')
   .addTag('Items', 'Items Endpoints')
+  .addTag('Cards', 'Card Endpoints')
   .build();
 
 const customOptions: SwaggerCustomOptions = {

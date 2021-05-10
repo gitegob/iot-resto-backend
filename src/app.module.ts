@@ -13,6 +13,8 @@ import { ResponseInterceptor } from './_shared_/interceptors/response.intercepto
 import { AuthModule } from './auth/auth.module';
 import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
 import { RestoModule } from './resto/resto.module';
+import { CardModule } from './card/card.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { RestoModule } from './resto/resto.module';
     OrderItemModule,
     AuthModule,
     RestoModule,
+    CardModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [
