@@ -1,3 +1,4 @@
+import { Resto } from 'src/resto/entities/resto.entity';
 import {
   Column,
   CreateDateColumn,
@@ -39,4 +40,7 @@ export class Order {
     onDelete: 'CASCADE',
   })
   orderItems: OrderItem[];
+
+  @ManyToOne(() => Resto, (resto) => resto.orders)
+  resto: Resto;
 }

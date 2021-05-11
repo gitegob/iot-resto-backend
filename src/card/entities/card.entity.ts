@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Resto } from 'src/resto/entities/resto.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Transaction } from './transaction.entity';
 
 @Entity('cards')
@@ -11,6 +18,10 @@ export class Card {
   uid: string;
   @Column({ default: 0 })
   balance: number;
+
   @OneToMany(() => Transaction, (transaction) => transaction.card)
   transactions: Transaction[];
+
+  @ManyToOne(() => Resto, (resto) => resto.cards)
+  resto: Resto;
 }

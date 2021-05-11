@@ -13,7 +13,7 @@ import { adminAuth } from '../_shared_/config/env.config';
 import { LoginDto } from './dto/login-dto';
 import { User } from './entities/auth.entity';
 import { Role } from '../_shared_/interfaces/enum.interface';
-import { JwtPayload } from '../_shared_/interfaces';
+import { JwtPayload, RestoPayload } from '../_shared_/interfaces';
 import { SignupDto } from './dto/signup-dto';
 import { DeactivateUserDto } from './dto/deactivate-user.dto';
 
@@ -60,9 +60,9 @@ export class AuthService {
     );
   }
 
-  async logIn(loginDto: LoginDto) {
+  async logIn(resto: RestoPayload, loginDto: LoginDto) {
     const user = await this.userRepo.findOne({
-      where: { username: loginDto.username, active: true },
+      where: { username: loginDto.username, active: true, resto: resto.id },
     });
     if (!user) throw new UnauthorizedException('This account does not exist');
     const isMatch = await bcrypt.compare(loginDto.password, user.password);
@@ -90,7 +90,7 @@ export class AuthService {
 
   async signUp(signupDto: SignupDto) {
     const user = await this.userRepo.findOne({
-      where: { username: signupDto.username },
+      where: [{ username: signupDto.username }, { role: Role.RESTO_ADMIN }],
     });
     if (user) throw new ConflictException('User already exists');
     const newUser = new User();

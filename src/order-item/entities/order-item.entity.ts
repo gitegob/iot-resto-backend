@@ -1,3 +1,4 @@
+import { Resto } from 'src/resto/entities/resto.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Item } from '../../item/entities/item.entity';
 import { Order } from '../../order/entities/order.entity';
@@ -21,4 +22,7 @@ export class OrderItem {
 
   @ManyToOne(() => Item, (item) => item.orderedItems)
   item: Item;
+
+  @ManyToOne(() => Resto, (resto) => resto.orderItems)
+  resto: Resto;
 }

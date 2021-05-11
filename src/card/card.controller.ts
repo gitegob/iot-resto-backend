@@ -12,13 +12,14 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/_shared_/decorators/role.decorator';
-import { JwtGuard } from 'src/_shared_/guards/jwt.guard';
-import { RolesGuard } from 'src/_shared_/guards/roles.guard';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/_shared_/interfaces/enum.interface';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
+import { RestoGuard } from 'src/auth/guards/resto.guard';
 
-@UseGuards(JwtGuard, RolesGuard)
+@UseGuards(RestoGuard, JwtGuard, RolesGuard)
 @ApiBearerAuth()
 @ApiTags('Cards')
 @Controller('cards')

@@ -1,5 +1,12 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Resto } from 'src/resto/entities/resto.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { Role } from '../../_shared_/interfaces/enum.interface';
 
@@ -22,4 +29,7 @@ export class User {
   active: boolean;
   @OneToMany(() => Order, (order) => order.waiter)
   ordersServed: Order[];
+
+  @ManyToOne(() => Resto, (resto) => resto.users)
+  resto: Resto;
 }

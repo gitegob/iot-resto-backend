@@ -6,6 +6,12 @@ import {
 } from '@nestjs/swagger';
 
 const config = new DocumentBuilder()
+  .addApiKey({
+    type: 'apiKey',
+    name: 'resto_token',
+    in: 'header',
+    description: 'API Key For External calls',
+  })
   .addBearerAuth({ type: 'http', scheme: 'bearer' })
   .setTitle('PressMe')
   .setDescription('The PressMe documentation')

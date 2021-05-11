@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CardDto } from './_shared_/dto/card.dto';
 @Injectable()
 export class AppService {
   getHello() {

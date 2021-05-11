@@ -7,3 +7,10 @@ export interface JwtPayload {
   username: string;
   role: Role;
 }
+
+export interface RestoPayload {
+  id: string;
+  name: string;
+  active: boolean;
+  addedAt: Date;
+}
