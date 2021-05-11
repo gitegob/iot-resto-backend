@@ -9,6 +9,7 @@ import { CreateRestoDto } from './dto/create-resto.dto';
 import { Resto } from './entities/resto.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { LoginRestoDto } from './dto/login-resto.dto';
 
 @Injectable()
 export class RestoService {
@@ -30,13 +31,13 @@ export class RestoService {
     return {
       message: 'Resto created',
       data: {
-        resto_token: this.jwtService.sign(newResto),
+        resto_token: this.jwtService.sign({ ...newResto }),
         restoData: newResto,
       },
     };
   }
 
-  async loginResto(loginRestoDto) {
+  async loginResto(loginRestoDto: LoginRestoDto) {
     const resto = await this.restoRepo.findOne({
       where: { name: loginRestoDto.name, active: true },
     });
@@ -50,9 +51,26 @@ export class RestoService {
     return {
       message: 'Resto logged in',
       data: {
-        resto_token: this.jwtService.sign(resto),
+        resto_token: this.jwtService.sign({ ...resto }),
         restoData: resto,
       },
     };
+  }
+
+  async validateResto(restoKey: string): Promise<Resto> {
+    let decoded;
+    try {
+      decoded = this.jwtService.verify(restoKey);
+    } catch (error) {
+      return;
+    }
+    if (!decoded) throw new UnauthorizedException('Invalid resto_token');
+
+    const resto = await this.restoRepo.findOne({
+      where: { id: decoded.id, name: decoded.name },
+    });
+    if (!resto) throw new UnauthorizedException('Invalid resto_token');
+    delete resto.password;
+    return resto;
   }
 }

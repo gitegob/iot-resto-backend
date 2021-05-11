@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Resto } from 'src/resto/entities/resto.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
 import { ItemStatus } from '../../_shared_/interfaces/enum.interface';
 @Entity('items')
@@ -23,4 +30,7 @@ export class Item {
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
   orderedItems: OrderItem[];
+
+  @ManyToOne(() => Resto, (resto) => resto.items)
+  resto: Resto;
 }

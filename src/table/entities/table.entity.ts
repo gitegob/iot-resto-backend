@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Resto } from 'src/resto/entities/resto.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { TableStatus } from '../../_shared_/interfaces/enum.interface';
 
@@ -15,4 +22,7 @@ export class Table {
 
   @OneToMany(() => Order, (order) => order.table)
   orders: Order[];
+
+  @ManyToOne(() => Resto, (resto) => resto.tables)
+  resto: Resto;
 }

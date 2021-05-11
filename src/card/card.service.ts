@@ -12,7 +12,6 @@ import {
 } from 'src/_shared_/interfaces/enum.interface';
 import { Repository } from 'typeorm';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from './entities/card.entity';
 import { Transaction } from './entities/transaction.entity';
 

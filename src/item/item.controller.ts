@@ -19,8 +19,8 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from '../_shared_/guards/jwt.guard';
-import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { JwtGuard } from '../auth/guards/jwt.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { Role } from '../_shared_/interfaces/enum.interface';
 import { Roles } from '../_shared_/decorators/role.decorator';
 

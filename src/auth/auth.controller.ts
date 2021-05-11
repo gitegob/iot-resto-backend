@@ -12,13 +12,16 @@ import { Role } from '../_shared_/interfaces/enum.interface';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login-dto';
 import { SignupDto } from './dto/signup-dto';
-import { JwtGuard } from '../_shared_/guards/jwt.guard';
-import { RolesGuard } from '../_shared_/guards/roles.guard';
+import { JwtGuard } from './guards/jwt.guard';
+import { RolesGuard } from './guards/roles.guard';
 import { DeactivateUserDto } from './dto/deactivate-user.dto';
 import { Roles } from '../_shared_/decorators/role.decorator';
 import { CreateRestoDto } from '../resto/dto/create-resto.dto';
 import { RestoService } from '../resto/resto.service';
 import { LoginRestoDto } from '../resto/dto/login-resto.dto';
+import { RestoGuard } from './guards/resto.guard';
+import { RestoDec } from 'src/_shared_/decorators/resto.decorator';
+import { RestoPayload } from 'src/_shared_/interfaces';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -34,9 +37,10 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(RestoGuard)
   @HttpCode(HttpStatus.OK)
-  logIn(@Body() loginDto: LoginDto) {
-    return this.authService.logIn(loginDto);
+  logIn(@RestoDec() resto: RestoPayload, @Body() loginDto: LoginDto) {
+    return this.authService.logIn(resto, loginDto);
   }
 
   @Post('login-resto')
@@ -47,24 +51,24 @@ export class AuthController {
 
   @Post('register')
   @ApiBearerAuth()
-  @Roles(Role.SITE_ADMIN)
-  @UseGuards(JwtGuard, RolesGuard)
+  @UseGuards(JwtGuard, RestoGuard, RolesGuard)
+  @Roles(Role.SITE_ADMIN, Role.RESTO_ADMIN)
   signUp(@Body() signupDto: SignupDto) {
     return this.authService.signUp(signupDto);
   }
 
   @Post('register-resto')
   @ApiBearerAuth()
-  @Roles(Role.SITE_ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.SITE_ADMIN)
   registerResto(@Body() createRestoDto: CreateRestoDto) {
     return this.restoService.createResto(createRestoDto);
   }
 
   @Put('admin/deactivate')
   @ApiBearerAuth()
-  @Roles(Role.SITE_ADMIN)
-  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.RESTO_ADMIN)
+  @UseGuards(JwtGuard, RestoGuard, RolesGuard)
   deactivate(@Body() deactivateDto: DeactivateUserDto) {
     return this.authService.deactivate(deactivateDto);
   }

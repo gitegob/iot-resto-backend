@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { CardDto } from './_shared_/dto/card.dto';
 
 @ApiTags('App')
 @Controller()
