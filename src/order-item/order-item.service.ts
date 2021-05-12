@@ -6,7 +6,8 @@ import { ItemService } from '../item/item.service';
 import { OrderService } from '../order/order.service';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { OrderItem } from './entities/order-item.entity';
-import { OrderStatus } from '../_shared_/interfaces/enum.interface';
+import { OrderStatus } from '../_shared_/interfaces/enums.interface';
+import { RestoPayload } from 'src/_shared_/interfaces';
 
 @Injectable()
 export class OrderItemService {
@@ -17,23 +18,27 @@ export class OrderItemService {
     private readonly itemService: ItemService,
   ) {}
   async create(
+    resto: RestoPayload,
     createOrderItemDto: CreateOrderItemDto,
     orderId: string,
     itemId: string,
   ): Promise<any> {
     const { data: order } = await this.orderService.findOne({
-      where: { id: orderId, status: OrderStatus.PENDING },
+      where: { id: orderId, resto, status: OrderStatus.PENDING },
     });
-    const { data: item } = await this.itemService.findOne(itemId);
+    const { data: item } = await this.itemService.findOne({
+      where: { id: itemId, resto },
+    });
     const newOrderItem = new OrderItem();
     newOrderItem.order = order;
     newOrderItem.item = item;
     newOrderItem.name = item.name;
     newOrderItem.quantity = createOrderItemDto.quantity;
     newOrderItem.price = item.price * newOrderItem.quantity;
+    newOrderItem.resto = resto as any;
     await this.orderItemRepo.save(newOrderItem);
     const orderItems = await this.orderItemRepo.find({
-      where: { order },
+      where: { resto, order },
     });
     order.price = orderPrice(orderItems);
     await this.orderService.saveOrder(order);
@@ -41,7 +46,7 @@ export class OrderItemService {
       data: {
         order: (
           await this.orderService.findOne({
-            where: { id: orderId },
+            where: { id: orderId, resto },
             relations: ['orderItems'],
           })
         ).data,
@@ -50,12 +55,13 @@ export class OrderItemService {
   }
 
   async findByOrder(
+    resto: RestoPayload,
     orderId: string,
   ): Promise<{
     data: OrderItem[];
   }> {
     return {
-      data: await this.orderItemRepo.find({ where: { order: orderId } }),
+      data: await this.orderItemRepo.find({ where: { resto, order: orderId } }),
     };
   }
 
@@ -65,8 +71,8 @@ export class OrderItemService {
     else return { data: orderItem };
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(resto: RestoPayload, id: string) {
+    await this.findOne({ where: { id, resto } });
     await this.orderItemRepo.delete(id);
     return {};
   }

@@ -8,14 +8,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { adminAuth } from '../_shared_/config/env.config';
 import { LoginDto } from './dto/login-dto';
-import { User } from './entities/auth.entity';
-import { Role } from '../_shared_/interfaces/enum.interface';
+import { User } from './entities/user.entity';
+import { Role } from '../_shared_/interfaces/enums.interface';
 import { JwtPayload, RestoPayload } from '../_shared_/interfaces';
 import { SignupDto } from './dto/signup-dto';
 import { DeactivateUserDto } from './dto/deactivate-user.dto';
+import { RegisterAgentDto } from './dto/register-agent.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,7 @@ export class AuthService {
       loginDto.password === adminAuth.password
     ) {
       const admin = await this.userRepo.findOne({
-        where: { username: loginDto.username },
+        where: { username: loginDto.username, role: Role.SITE_ADMIN },
       });
       if (admin) {
         const isMatch = await bcrypt.compare(loginDto.password, admin.password);
@@ -61,16 +62,30 @@ export class AuthService {
   }
 
   async logIn(resto: RestoPayload, loginDto: LoginDto) {
-    const user = await this.userRepo.findOne({
-      where: { username: loginDto.username, active: true, resto: resto.id },
-    });
+    const isAdmin =
+      loginDto.username === adminAuth.username &&
+      loginDto.password === adminAuth.password;
+    const conditions: FindOneOptions<User> = isAdmin
+      ? {
+          where: { username: loginDto.username, active: true },
+          relations: ['resto'],
+        }
+      : {
+          where: { username: loginDto.username, active: true, resto },
+          relations: ['resto'],
+        };
+    const user = await this.userRepo.findOne(conditions);
     if (!user) throw new UnauthorizedException('This account does not exist');
     const isMatch = await bcrypt.compare(loginDto.password, user.password);
     if (!isMatch)
       throw new UnauthorizedException('Invalid username or password');
     delete user.password;
+    delete user.resto?.password;
     return {
-      data: { access_token: this.jwtService.sign({ ...user }), userData: user },
+      data: {
+        access_token: this.jwtService.sign({ ...user }),
+        userData: user,
+      },
     };
   }
 
@@ -88,9 +103,11 @@ export class AuthService {
     return user;
   }
 
-  async signUp(signupDto: SignupDto) {
+  async signUp(resto: any, signupDto: SignupDto) {
+    if (signupDto.username === adminAuth.username)
+      throw new ConflictException('That username exists');
     const user = await this.userRepo.findOne({
-      where: [{ username: signupDto.username }, { role: Role.RESTO_ADMIN }],
+      where: { username: signupDto.username, resto: resto.id },
     });
     if (user) throw new ConflictException('User already exists');
     const newUser = new User();
@@ -98,6 +115,7 @@ export class AuthService {
     newUser.lastName = signupDto.lastName;
     newUser.username = signupDto.username;
     newUser.role = signupDto.role;
+    newUser.resto = resto.id;
     newUser.password = await bcrypt.hash(signupDto.password, 10);
     await this.userRepo.save(newUser);
     delete newUser.password;
@@ -109,9 +127,36 @@ export class AuthService {
     };
   }
 
-  async deactivate(deactivateDto: DeactivateUserDto) {
+  async registerAgent(registerAgentDto: RegisterAgentDto) {
+    if (registerAgentDto.username === adminAuth.username)
+      throw new ConflictException('That username exists');
     const user = await this.userRepo.findOne({
-      where: { username: deactivateDto.username, active: true },
+      where: { username: registerAgentDto.username },
+    });
+    if (user) throw new ConflictException('User already exists');
+    const newAgent = new User();
+    newAgent.firstName = registerAgentDto.firstName;
+    newAgent.lastName = registerAgentDto.lastName;
+    newAgent.username = registerAgentDto.username;
+    newAgent.role = Role.AGENT;
+    newAgent.password = await bcrypt.hash(registerAgentDto.password, 10);
+    await this.userRepo.save(newAgent);
+    delete newAgent.password;
+    return {
+      data: {
+        access_token: this.jwtService.sign({ ...newAgent }),
+        userData: newAgent,
+      },
+    };
+  }
+
+  async deactivate(resto: RestoPayload, deactivateDto: DeactivateUserDto) {
+    const user = await this.userRepo.findOne({
+      where: {
+        username: deactivateDto.username,
+        resto: resto.id,
+        active: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
     user.active = false;

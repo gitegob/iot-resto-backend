@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
-import { ItemStatus } from '../../_shared_/interfaces/enum.interface';
+import { ItemStatus } from '../../_shared_/interfaces/enums.interface';
 @Entity('items')
 export class Item {
   @PrimaryGeneratedColumn()

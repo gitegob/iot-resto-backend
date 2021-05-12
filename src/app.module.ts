@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerInterceptor } from './_shared_/interceptors/logger.interceptor';
 import { RestoModule } from './resto/resto.module';
 import { CardModule } from './card/card.module';
-import { GlobalJwtModule } from './global-jwt/global-jwt.module';
+import { JsonWebTokenModule } from './jsonwebtoken/jsonwebtoken.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { GlobalJwtModule } from './global-jwt/global-jwt.module';
     AuthModule,
     RestoModule,
     CardModule,
-    GlobalJwtModule,
+    JsonWebTokenModule,
   ],
   controllers: [AppController],
   providers: [

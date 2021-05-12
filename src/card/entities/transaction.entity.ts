@@ -1,4 +1,6 @@
-import { TransactionType } from 'src/_shared_/interfaces/enum.interface';
+import { User } from 'src/auth/entities/user.entity';
+import { Resto } from 'src/resto/entities/resto.entity';
+import { TransactionType } from 'src/_shared_/interfaces/enums.interface';
 import {
   Column,
   CreateDateColumn,
@@ -22,4 +24,8 @@ export class Transaction {
   date: Date;
   @ManyToOne(() => Card, (card) => card.transactions)
   card: Card;
+  @ManyToOne(() => User, (agent) => agent.transactions)
+  agent: User;
+  @ManyToOne(() => Resto, (resto) => resto.cardTransactions)
+  resto: Resto;
 }

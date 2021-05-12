@@ -7,8 +7,13 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Role } from '../_shared_/interfaces/enum.interface';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Role } from '../_shared_/interfaces/enums.interface';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login-dto';
 import { SignupDto } from './dto/signup-dto';
@@ -22,6 +27,7 @@ import { LoginRestoDto } from '../resto/dto/login-resto.dto';
 import { RestoGuard } from './guards/resto.guard';
 import { RestoDec } from 'src/_shared_/decorators/resto.decorator';
 import { RestoPayload } from 'src/_shared_/interfaces';
+import { RegisterAgentDto } from './dto/register-agent.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -37,6 +43,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiSecurity('api_key', ['api_key'])
+  @ApiConsumes('application/json', 'application/x-www-form-urlencoded')
   @UseGuards(RestoGuard)
   @HttpCode(HttpStatus.OK)
   logIn(@RestoDec() resto: RestoPayload, @Body() loginDto: LoginDto) {
@@ -51,10 +59,19 @@ export class AuthController {
 
   @Post('register')
   @ApiBearerAuth()
-  @UseGuards(JwtGuard, RestoGuard, RolesGuard)
-  @Roles(Role.SITE_ADMIN, Role.RESTO_ADMIN)
-  signUp(@Body() signupDto: SignupDto) {
-    return this.authService.signUp(signupDto);
+  @ApiSecurity('api_key', ['api_key'])
+  @UseGuards(RestoGuard, JwtGuard, RolesGuard)
+  @Roles(Role.RESTO_ADMIN)
+  signUp(@RestoDec() resto: RestoPayload, @Body() signupDto: SignupDto) {
+    return this.authService.signUp(resto, signupDto);
+  }
+
+  @Post('register-agent')
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.SITE_ADMIN)
+  registerAgent(@Body() registerAgentDto: RegisterAgentDto) {
+    return this.authService.registerAgent(registerAgentDto);
   }
 
   @Post('register-resto')
@@ -67,9 +84,13 @@ export class AuthController {
 
   @Put('admin/deactivate')
   @ApiBearerAuth()
+  @ApiSecurity('api_key', ['api_key'])
   @Roles(Role.RESTO_ADMIN)
   @UseGuards(JwtGuard, RestoGuard, RolesGuard)
-  deactivate(@Body() deactivateDto: DeactivateUserDto) {
-    return this.authService.deactivate(deactivateDto);
+  deactivate(
+    @RestoDec() resto: RestoPayload,
+    @Body() deactivateDto: DeactivateUserDto,
+  ) {
+    return this.authService.deactivate(resto, deactivateDto);
   }
 }

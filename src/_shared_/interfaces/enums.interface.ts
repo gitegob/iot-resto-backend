@@ -32,9 +32,16 @@ export enum Role {
   MANAGER = 'MANAGER',
   WAITER = 'WAITER',
   KITCHEN = 'KITCHEN',
+  AGENT = 'AGENT',
+}
+
+export enum RegisterRole {
+  MANAGER = 'MANAGER',
+  WAITER = 'WAITER',
+  KITCHEN = 'KITCHEN',
 }
 
 export enum TransactionType {
   RECHARGE = 'RECHARGE',
-  DEDUCT = 'DEDUCT',
+  PAYMENT = 'PAYMENT',
 }

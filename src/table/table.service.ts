@@ -4,9 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RestoPayload } from 'src/_shared_/interfaces';
 import { FindOneOptions, Repository } from 'typeorm';
 import { Order } from '../order/entities/order.entity';
-import { TableStatusQuery } from '../_shared_/interfaces/enum.interface';
+import { TableStatusQuery } from '../_shared_/interfaces/enums.interface';
 import { sortStuffByDate } from '../_shared_/utils';
 import { CreateTableDto } from './dto/create-table.dto';
 import { Table } from './entities/table.entity';
@@ -17,9 +18,9 @@ export class TableService {
     @InjectRepository(Table) private readonly tableRepo: Repository<Table>,
   ) {}
 
-  async create(createTableDto: CreateTableDto) {
+  async create(resto: RestoPayload, createTableDto: CreateTableDto) {
     const table = await this.tableRepo.findOne({
-      where: { number: createTableDto.number },
+      where: { number: createTableDto.number, resto },
     });
     if (table) throw new ConflictException('Table already exists');
     const newTable = new Table();
@@ -28,18 +29,18 @@ export class TableService {
     return { data: newTable };
   }
 
-  async findAll(status: TableStatusQuery) {
+  async findAll(resto: RestoPayload, status: TableStatusQuery) {
     if (status === TableStatusQuery.ALL)
-      return { data: await this.tableRepo.find() };
+      return { data: await this.tableRepo.find({ where: { resto } }) };
     return {
       data: await this.tableRepo.find({
-        where: { status },
+        where: { resto, status },
       }),
     };
   }
-  async getUnpaidOrders(tableId: string) {
+  async getUnpaidOrders(resto: RestoPayload, tableId: string) {
     const { data: table } = await this.findOne({
-      where: { id: tableId },
+      where: { id: tableId, resto },
       relations: ['orders'],
     });
     const orders = sortStuffByDate<Order>(
@@ -47,16 +48,16 @@ export class TableService {
     );
     return { data: { table: table.number, unpaid: orders } };
   }
-  async findTable(id: string) {
+  async findTable(resto: RestoPayload, id: string) {
     const { data: table } = await this.findOne({
-      where: { id },
+      where: { id, resto },
       relations: ['orders'],
     });
     return { data: table };
   }
-  async findTableOrders(tableId: string) {
+  async findTableOrders(resto: RestoPayload, tableId: string) {
     const { data: table } = await this.findOne({
-      where: { id: tableId },
+      where: { id: tableId, resto },
       relations: ['orders'],
     });
     const orders = sortStuffByDate(table.orders);
@@ -70,8 +71,8 @@ export class TableService {
     else return { data: table };
   }
 
-  async remove(id: string) {
-    await this.findOne({ where: { id } });
+  async remove(resto: RestoPayload, id: string) {
+    await this.findOne({ where: { id, resto } });
     await this.tableRepo.delete(id);
     return { message: 'Table deleted' };
   }

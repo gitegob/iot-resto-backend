@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
-import { TableStatus } from '../../_shared_/interfaces/enum.interface';
+import { TableStatus } from '../../_shared_/interfaces/enums.interface';
 
 @Entity('tables')
 export class Table {

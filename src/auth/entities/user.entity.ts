@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import { Transaction } from 'src/card/entities/transaction.entity';
 import { Resto } from 'src/resto/entities/resto.entity';
 import {
   Column,
@@ -8,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
-import { Role } from '../../_shared_/interfaces/enum.interface';
+import { Role } from '../../_shared_/interfaces/enums.interface';
 
 @Entity('users')
 export class User {
@@ -18,7 +19,7 @@ export class User {
   firstName: string;
   @Column()
   lastName: string;
-  @Column({ unique: true })
+  @Column()
   username: string;
   @Column()
   @Exclude()
@@ -29,7 +30,8 @@ export class User {
   active: boolean;
   @OneToMany(() => Order, (order) => order.waiter)
   ordersServed: Order[];
-
   @ManyToOne(() => Resto, (resto) => resto.users)
   resto: Resto;
+  @OneToMany(() => Transaction, (transaction) => transaction.agent)
+  transactions: Transaction[];
 }

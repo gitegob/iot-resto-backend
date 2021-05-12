@@ -5,17 +5,20 @@ import {
   ForbiddenException,
   Inject,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { RestoService } from 'src/resto/resto.service';
+import { adminAuth } from 'src/_shared_/config/env.config';
 
 @Injectable()
 export class RestoGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
-    @Inject('RestoService') private readonly restoService,
+    @Inject('RestoService') private readonly restoService: RestoService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const resto_token = request.headers['resto_token'];
+    const isAdminUsername = request?.body?.username === adminAuth.username;
+    const isAdminPwd = request?.body?.password === adminAuth.password;
+    if (isAdminUsername && isAdminPwd) return true;
+    const resto_token = request.headers['resto-token'];
     if (!resto_token)
       throw new ForbiddenException('1111Forbidden, Restaurant unknown');
     const resto = await this.restoService.validateResto(resto_token);

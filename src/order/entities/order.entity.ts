@@ -7,10 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../auth/entities/auth.entity';
+import { User } from '../../auth/entities/user.entity';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
 import { Table } from '../../table/entities/table.entity';
-import { OrderStatus } from '../../_shared_/interfaces/enum.interface';
+import { OrderStatus } from '../../_shared_/interfaces/enums.interface';
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn()

@@ -1,4 +1,4 @@
 import { SetMetadata } from '@nestjs/common';
-import { Role } from '../../_shared_/interfaces/enum.interface';
+import { Role } from '../interfaces/enums.interface';
 
 export const Roles = (...roles: Role[]) => SetMetadata('roles', roles);
