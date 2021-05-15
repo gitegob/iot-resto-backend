@@ -1,18 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
-import { RegisterRole, Role } from '../../_shared_/interfaces/enums.interface';
+import { IsString } from 'class-validator';
 
-export class SignupDto {
+export class RegisterAgentDto {
   @IsString()
   @ApiProperty({ name: 'firstName' })
   firstName: string;
   @IsString()
   @ApiProperty({ name: 'lastName' })
   lastName: string;
-  @IsString()
-  @IsEnum(RegisterRole)
-  @ApiProperty({ name: 'role', enum: RegisterRole })
-  role: Role;
   @IsString()
   @ApiProperty({ name: 'username' })
   username: string;

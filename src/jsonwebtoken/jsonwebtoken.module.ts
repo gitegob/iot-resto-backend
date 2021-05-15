@@ -14,4 +14,4 @@ import { jwt } from 'src/_shared_/config/env.config';
   ],
   exports: [JwtModule],
 })
-export class GlobalJwtModule {}
+export class JsonWebTokenModule {}

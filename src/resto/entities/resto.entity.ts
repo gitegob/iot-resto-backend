@@ -1,5 +1,6 @@
-import { User } from 'src/auth/entities/auth.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { Card } from 'src/card/entities/card.entity';
+import { Transaction } from 'src/card/entities/transaction.entity';
 import { Item } from 'src/item/entities/item.entity';
 import { OrderItem } from 'src/order-item/entities/order-item.entity';
 import { Order } from 'src/order/entities/order.entity';
@@ -42,4 +43,7 @@ export class Resto {
 
   @OneToMany(() => Card, (card) => card.resto)
   cards: Card[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.resto)
+  cardTransactions: Transaction[];
 }

@@ -6,7 +6,7 @@ import {
   MaxLength,
   IsOptional,
 } from 'class-validator';
-import { ItemStatus } from '../../_shared_/interfaces/enum.interface';
+import { ItemStatus } from '../../_shared_/interfaces/enums.interface';
 
 export class CreateItemDto {
   @IsString()
